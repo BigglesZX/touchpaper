@@ -1,0 +1,4 @@
+*.pyc
+*.egg-info/
+Thumbs.db
+.DS_Store
