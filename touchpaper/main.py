@@ -1,29 +1,50 @@
 import boto.ec2
-import os
+import json
 import sys
 from boto.ec2 import EC2Connection
+from os import environ, getcwd
+from os.path import exists, expanduser, join
 from .prompts import *
 
 
-# TODO: use boto's own env vars
-AWS_KEY = os.environ['TOUCHPAPER_AWS_KEY']
-AWS_SECRET = os.environ['TOUCHPAPER_AWS_SECRET']
-
-# TODO: save this somewhere useful
-DEFAULT_AMI = 'ami-66ef0111'
+RC_FILE_NAME = '.touchpaperrc'
+AWS_KEY_ENV_VAR = 'AWS_ACCESS_KEY_ID'
+AWS_SECRET_ENV_VAR = 'AWS_SECRET_ACCESS_KEY'
 
 
 def main():
-    if 'TOUCHPAPER_AWS_KEY' not in os.environ or 'TOUCHPAPER_AWS_SECRET' not in os.environ:
-        print "Please ensure you have configured the TOUCHPAPER_AWS_KEY and TOUCHPAPER_AWS_SECRET variables in your environment."
+    local_config_path = join(getcwd(), RC_FILE_NAME)
+    home_config_path = join(expanduser('~'), RC_FILE_NAME)
+    config_path = False
+    config = False
+    
+    if exists(local_config_path):
+        config_path = local_config_path
+    elif exists(home_config_path):
+        config_path = home_config_path
+    
+    if config_path:
+        with open(config_path) as f:
+            config = json.load(f)
+        
+    if config is False and (AWS_KEY_ENV_VAR not in environ or AWS_SECRET_ENV_VAR not in environ):
+        print "You're not using the %s config file, so please ensure you have configured the %s and %s variables in your environment." % (RC_FILE_NAME, AWS_KEY_ENV_VAR, AWS_SECRET_ENV_VAR)
         sys.exit(1)
     
-    conn = EC2Connection(AWS_KEY, AWS_SECRET)
+    if config:
+        key, secret = prompt_for_credentials(config)
+        conn = EC2Connection(key, secret)
+    else:
+        print "Using AWS credentials from environment"
+        conn = EC2Connection()
     
     region = prompt_for_regions(conn)
     print region
-
-    conn = boto.ec2.connect_to_region(region.name, aws_access_key_id=AWS_KEY, aws_secret_access_key=AWS_SECRET)
+    
+    if config:
+        conn = boto.ec2.connect_to_region(region.name, aws_access_key_id=key, aws_secret_access_key=secret)
+    else:
+        conn = boto.ec2.connect_to_region(region.name)
     
     availability_zone = prompt_for_availability_zone(conn)
     print availability_zone

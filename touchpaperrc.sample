@@ -1,0 +1,13 @@
+{
+    "aws_credentials": [
+        {
+            "name": "MyAWSAccount",
+            "key": "AAAAAAAAAAAAAAAAAAAA",
+            "secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        }
+    ],
+    "favourite_amis": [
+        "ami-66ef0111"
+    ],
+    "defaults": {}
+}

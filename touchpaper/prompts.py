@@ -17,6 +17,11 @@ def prompt_for_availability_zone(conn):
     return available_zones[choice_prompt([x.name for x in available_zones], 'Please select a target availability zone:')]
 
 
+def prompt_for_credentials(config):
+    selection = choice_prompt([x['name'] for x in config['aws_credentials']], 'Please select a set of AWS credentials:')
+    return (config['aws_credentials'][selection]['key'], config['aws_credentials'][selection]['secret'])
+
+
 def prompt_for_instance_type():
     instance_types = get_instance_types()
     return instance_types[choice_prompt(instance_types, 'Please select an instance type:')]

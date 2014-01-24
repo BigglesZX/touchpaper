@@ -1,3 +1,7 @@
 h1. touchpaper
 
 A command-line utility to quickly launch EC2 instances. A tasty accompaniment to Fabric.
+
+h2. Configuration
+
+To use multiple AWS credential sets and favourite AMIs, copy @touchpaperrc.sample@ to @.touchpaperrc@ in your project directory or your home directory and edit as desired. This will also enable saving of last-used config items.
