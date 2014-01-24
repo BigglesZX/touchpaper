@@ -1,6 +1,7 @@
 import boto.ec2
 import os
 import sys
+from boto.ec2 import EC2Connection
 from .utils import choice_prompt, text_prompt
 
 
@@ -67,8 +68,8 @@ def prompt_for_keypair(conn):
     return available_keypairs[choice_prompt([x.name for x in available_keypairs], 'Please select a keypair:')]
 
 
-def prompt_for_regions():
-    available_regions = boto.ec2.regions(aws_access_key_id=AWS_KEY, aws_secret_access_key=AWS_SECRET)
+def prompt_for_regions(conn):
+    available_regions = conn.get_all_regions()
     return available_regions[choice_prompt([x.name for x in available_regions], 'Please select a target region:')]
 
 
@@ -93,7 +94,9 @@ def main():
         print "Please ensure you have configured the TOUCHPAPER_AWS_KEY and TOUCHPAPER_AWS_SECRET variables in your environment."
         sys.exit(1)
     
-    region = prompt_for_regions()
+    conn = EC2Connection(AWS_KEY, AWS_SECRET)
+    
+    region = prompt_for_regions(conn)
     print region
 
     conn = boto.ec2.connect_to_region(region.name, aws_access_key_id=AWS_KEY, aws_secret_access_key=AWS_SECRET)
