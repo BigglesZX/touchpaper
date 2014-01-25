@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='touchpaper',
-    version='0.0.1',
+    version='0.1.0',
     description='A command-line utility to quickly launch EC2 instances. A tasty accompaniment to Fabric.',
     author='James Tiplady',
     url='http://github.com/BigglesZX/touchpaper',

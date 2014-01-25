@@ -6,8 +6,9 @@
             "secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
         }
     ],
-    "favourite_amis": [
-        "ami-66ef0111"
-    ],
+    "favourite_amis": {
+        "ami-66ef0111": "Alestic - eu-west-1 - 12.04 LTS - EBS",
+        "ami-14907e63": "Alestic - eu-west-1 - 12.04 LTS - instance store"
+    },
     "defaults": {}
 }

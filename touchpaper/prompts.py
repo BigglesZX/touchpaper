@@ -3,9 +3,16 @@ from .utils import (choice_prompt,
                     text_prompt)
 
 
-def prompt_for_ami():
-    # TODO: read from local list of favourite AMIs
-    return text_prompt('Please enter an AMI ID:')
+def prompt_for_ami(config):
+    if config and 'favourite_amis' in config and config['favourite_amis']:
+        favourite_amis = ["%s: %s" % (k, v) for k, v in config['favourite_amis'].iteritems()]
+        selection = choice_prompt(favourite_amis, 'Please select an AMI or enter an AMI ID:')
+        if isinstance(selection, int):
+            return favourite_amis[selection].split(':')[0]
+        else:
+            return selection
+    else:
+        return text_prompt('Please enter an AMI ID:')
 
 
 def prompt_for_atp():
@@ -28,8 +35,9 @@ def prompt_for_instance_type():
 
 
 def prompt_for_keypair(conn):
-    # TODO: deal with lack of keypairs on account
     available_keypairs = conn.get_all_key_pairs()
+    if not available_keypairs:
+        return False
     return available_keypairs[choice_prompt([x.name for x in available_keypairs], 'Please select a keypair:')]
 
 
@@ -49,6 +57,9 @@ def prompt_for_storage():
     return
 
 
-def prompt_for_user_data():
+def prompt_for_tags():
     # TODO: load local definition of common fields to prompt for (e.g. name)
-    return
+    name = text_prompt('Enter a name for the instance:')
+    return {
+        'Name': name,
+    }
