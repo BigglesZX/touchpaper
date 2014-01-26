@@ -25,6 +25,7 @@ def prompt_for_availability_zone(conn):
 
 
 def prompt_for_credentials(config):
+    # FIXME: catch missing field in config file?
     selection = choice_prompt([x['name'] for x in config['aws_credentials']], 'Please select a set of AWS credentials:')
     return (config['aws_credentials'][selection]['key'], config['aws_credentials'][selection]['secret'])
 

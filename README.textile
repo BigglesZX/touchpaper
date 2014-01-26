@@ -2,6 +2,17 @@ h1. touchpaper
 
 A command-line utility to quickly launch EC2 instances. A tasty accompaniment to Fabric.
 
+h2. Installation
+
+bc. $ python setup.py install
+$ touchpaper
+
+To try things out without creating any instances, use dry-run mode:
+
+bc. $ touchpaper --dry-run
+
 h2. Configuration
 
-To use multiple AWS credential sets and favourite AMIs, copy @touchpaperrc.sample@ to @.touchpaperrc@ in your project directory or your home directory and edit as desired. This will also enable saving of last-used config items.
+To use a single AWS account, set the @AWS_ACCESS_KEY_ID@ and @AWS_SECRET_ACCESS_KEY@ environment variables in your shell.
+
+To use multiple AWS credential sets and favourite AMIs, copy @touchpaperrc.sample@ to @.touchpaperrc@ in your home directory and edit as desired. This will also enable saving of last-used config items.
