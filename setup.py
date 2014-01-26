@@ -11,7 +11,7 @@ setup(
     author='James Tiplady',
     url='http://github.com/BigglesZX/touchpaper',
     packages=find_packages(),
-    install_requires=['boto==2.23.0'],
+    install_requires=['boto==2.23.0', 'colorama==0.2.7'],
     entry_points={
         'console_scripts': [
             'touchpaper = touchpaper.main:main',

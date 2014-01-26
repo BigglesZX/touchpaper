@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.2.1 (January 26th, 2014)
+--------------------------
+
+* New: Added terminal colours via colorama
+* Improved: Command-line option handling including --help and --version options
+* Improved: Messaging when no security groups are present
+* Improved: Code comments!
+
 0.2.0 (January 26th, 2014)
 --------------------------
 

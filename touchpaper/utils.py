@@ -8,7 +8,12 @@ RC_FILE_NAME = '.touchpaperrc'
 
 
 def choice_prompt(choices, prompt, **args):
-    # TODO: 'default' option implementation
+    '''
+    Present the user with some numbered choices and accept input to make a 
+    selection
+    
+    TODO: 'default' option implementation
+    '''
     print prompt
     for i, choice in enumerate(choices):
         print " %d ) %s" % (i, choice)
@@ -17,6 +22,10 @@ def choice_prompt(choices, prompt, **args):
 
 
 def find_config():
+    '''
+    Search the current user's home directory, or the current directory, for 
+    our rc file. If found, attempt to parse it.
+    '''
     local_config_path = join(getcwd(), RC_FILE_NAME)
     home_config_path = join(expanduser('~'), RC_FILE_NAME)
     config_path = False
@@ -34,6 +43,9 @@ def find_config():
 
 
 def get_instance_types():
+    '''
+    Hardcoded list of available instance types as described by the EC2 API
+    '''
     return [
         "t1.micro",
         "m1.small",
@@ -67,6 +79,10 @@ def get_instance_types():
 
 
 def text_prompt(prompt, **args):
-    # TODO: 'default' input implementation
+    '''
+    Show the user a text prompt and return their response
+    
+    TODO: 'default' input implementation
+    '''
     selection = raw_input('%s ' % prompt)
     return selection
