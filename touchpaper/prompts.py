@@ -54,8 +54,17 @@ def prompt_for_security_group(conn):
 
 
 def prompt_for_storage():
-    # TODO: options to instantiate new EBS volume at sensible size
-    return
+    print "If you want to create and attach an EBS volume to this instance, enter its size in GB."
+    print "Type 0 or press Enter to skip volume creation."
+    size = text_prompt('Size of volume in GB:')
+    if size == '' or int(size) == 0:
+        return False
+    return int(size)
+
+
+def prompt_for_storage_name():
+    name = text_prompt('Enter friendly name for volume:')
+    return name or False
 
 
 def prompt_for_tags():

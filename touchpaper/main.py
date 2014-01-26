@@ -50,6 +50,15 @@ def main():
     atp = bool(prompt_for_atp())
     
     storage = prompt_for_storage()
+    storage_name = False
+    if storage:
+        storage_name = prompt_for_storage_name()
+        
+        # source: http://stackoverflow.com/a/13604274/258794
+        dev_sda1 = boto.ec2.blockdevicemapping.EBSBlockDeviceType()
+        dev_sda1.size = storage
+        bdm = boto.ec2.blockdevicemapping.BlockDeviceMapping()
+        bdm['/dev/sda1'] = dev_sda1
     
     keypair = prompt_for_keypair(conn)
     if keypair is False:
@@ -65,7 +74,7 @@ def main():
     print "AMI: %s" % ami
     print "Instance type: %s" % instance_type
     print "Accidental termination protection: %s" % ("Yes" if atp else "No")
-    #print "Storage: %s" % storage
+    print "Storage: %s" % (('%dGB EBS' % storage) if storage else "None")
     print "Keypair: %s" % (keypair if keypair else "None")
     #print "Security group: %s" % security_group.name
     print "Tags: %s" % tags
@@ -80,7 +89,7 @@ def main():
                                      security_groups=[security_group.name,],
                                      instance_type=instance_type,
                                      placement=availability_zone.name,
-                                     #block_device_map=storage,
+                                     block_device_map=bdm if storage else None,
                                      disable_api_termination=atp,
                                      dry_run=args.dry_run)
     instance = reservation.instances[0]
@@ -94,7 +103,13 @@ def main():
     if tags:
         for tag, value in tags.iteritems():
             instance.add_tag(tag, value)
-        print "Tags added"
+        print "Instance tags added"
+    
+    if storage_name:
+        volumes = conn.get_all_volumes(filters={ 'attachment.instance-id': instance.id })
+        if volumes:
+            volumes[0].add_tag('Name', storage_name)
+            print "EBS volume tags added"
     
     print "Done."
     

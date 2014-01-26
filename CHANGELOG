@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2.0 (January 26th, 2014)
+--------------------------
+
+* New: EBS volume creation and attachment support
+
 0.1.0 (January 25th, 2014)
 --------------------------
 
