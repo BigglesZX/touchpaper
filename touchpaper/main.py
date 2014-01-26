@@ -91,7 +91,7 @@ def main():
     print "Launching instance..."
     
     reservation = conn.run_instances(image_id=ami,
-                                     #key_name=keypair,
+                                     key_name=keypair,
                                      security_groups=[security_group.name,],
                                      instance_type=instance_type,
                                      placement=availability_zone.name,
