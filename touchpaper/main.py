@@ -104,7 +104,7 @@ def main():
         print "Instance state: %s ..." % instance.state
         sleep(5)
         instance.update()
-    print "Instance running! ID: %s" % instance.id
+    print "Instance running! ID: %s; public DNS: %s" % (instance.id, instance.public_dns_name)
     
     if tags:
         for tag, value in tags.iteritems():
