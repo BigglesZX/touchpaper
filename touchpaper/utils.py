@@ -1,3 +1,12 @@
+import json
+from os import getcwd
+from os.path import exists, expanduser, join
+
+
+# FIXME: DRY
+RC_FILE_NAME = '.touchpaperrc'
+
+
 def choice_prompt(choices, prompt, **args):
     # TODO: 'default' option implementation
     print prompt
@@ -5,6 +14,23 @@ def choice_prompt(choices, prompt, **args):
         print " %d ) %s" % (i, choice)
     selection = raw_input("Enter your choice: ")
     return int(selection)
+
+
+def find_config():
+    local_config_path = join(getcwd(), RC_FILE_NAME)
+    home_config_path = join(expanduser('~'), RC_FILE_NAME)
+    config_path = False
+    config = False
+    
+    if exists(local_config_path):
+        config_path = local_config_path
+    elif exists(home_config_path):
+        config_path = home_config_path
+    
+    if config_path:
+        with open(config_path) as f:
+            config = json.load(f)
+    return config
 
 
 def get_instance_types():
