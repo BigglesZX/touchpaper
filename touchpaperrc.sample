@@ -7,8 +7,8 @@
         }
     ],
     "favourite_amis": {
-        "ami-66ef0111": "Alestic - eu-west-1 - 12.04 LTS - EBS",
-        "ami-14907e63": "Alestic - eu-west-1 - 12.04 LTS - instance store"
+        "ami-aa56a1dd": "Alestic - eu-west-1 - 12.04 LTS - EBS",
+        "ami-3a689f4d": "Alestic - eu-west-1 - 12.04 LTS - instance store"
     },
     "defaults": {}
 }
