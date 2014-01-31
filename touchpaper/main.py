@@ -117,7 +117,7 @@ def main():
     print "Instance type: %s" % instance_type
     print "Accidental termination protection: %s" % ("Yes" if atp else "No")
     print "Storage: %s" % (('%dGB EBS' % storage) if storage else "None")
-    print "Keypair: %s" % (keypair if keypair else "None")
+    print "Keypair: %s" % (keypair.name if keypair else "None")
     #print "Security group: %s" % security_group.name
     print "Tags: %s" % tags
     
@@ -128,7 +128,7 @@ def main():
     
     ''' Request a reservation with the selected parameters '''
     reservation = conn.run_instances(image_id=ami,
-                                     key_name=keypair,
+                                     key_name=keypair.name,
                                      security_groups=[security_group.name,],
                                      instance_type=instance_type,
                                      placement=availability_zone.name,
