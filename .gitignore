@@ -2,3 +2,4 @@
 *.egg-info/
 Thumbs.db
 .DS_Store
+dist/
