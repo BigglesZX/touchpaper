@@ -4,15 +4,28 @@ A command-line utility to quickly launch EC2 instances. A tasty accompaniment to
 
 h2. Installation
 
-bc. $ python setup.py install
-$ touchpaper
+The easiest way to install touchpaper is via PyPi:
+
+bc. $ pip install touchpaper
+
+h2. Configuration
+
+touchpaper needs a little configuration to be made aware of your AWS credentials, but that's about it.
+
+To use a single AWS account, set the @AWS_ACCESS_KEY_ID@ and @AWS_SECRET_ACCESS_KEY@ environment variables in your shell.
+
+To use multiple AWS credential sets and favourite AMIs, copy @touchpaperrc.sample@ to @.touchpaperrc@ in your home directory or your project root and edit as desired. This will also enable saving of last-used config items (when I implement that).
+
+When you run touchpaper it will first look in the current working directory for @.touchpaperrc@ file, then your home directory.
+
+For info on generating/obtaining AWS credentials, see "this guide":http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html
+
+h2. Usage
+
+touchpaper simply asks you a series of questions to pre-configure your EC2 instance, then launches it:
+
+bc. $ touchpaper
 
 To try things out without creating any instances, use dry-run mode:
 
 bc. $ touchpaper --dry-run
-
-h2. Configuration
-
-To use a single AWS account, set the @AWS_ACCESS_KEY_ID@ and @AWS_SECRET_ACCESS_KEY@ environment variables in your shell.
-
-To use multiple AWS credential sets and favourite AMIs, copy @touchpaperrc.sample@ to @.touchpaperrc@ in your home directory and edit as desired. This will also enable saving of last-used config items.
