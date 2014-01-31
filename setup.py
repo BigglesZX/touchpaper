@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# FIXME: dirty hack to allow dist building
+# FIXME: dirty hack to allow dist building on vagrant
 # source: http://bugs.python.org/issue8876
 import os
 del os.link
