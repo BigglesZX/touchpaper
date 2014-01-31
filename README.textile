@@ -4,7 +4,7 @@ A command-line utility to quickly launch EC2 instances. A tasty accompaniment to
 
 h2. Installation
 
-The easiest way to install touchpaper is via PyPi:
+The easiest way to install touchpaper is via "PyPi":https://pypi.python.org/pypi/touchpaper/
 
 bc. $ pip install touchpaper
 
@@ -29,3 +29,7 @@ bc. $ touchpaper
 To try things out without creating any instances, use dry-run mode:
 
 bc. $ touchpaper --dry-run
+
+h2. Feedback
+
+touchpaper is a work in progress and some features do not yet work properly in all scenarios. You're welcome to submit issues via Github, nonetheless, and I'll endeavour to include a roadmap at some point that illustrates which bits I know to be only partially functional at this time. I welcome your feedback and contributions, and indeed any attention to this project at all. Thank you.
