@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+# FIXME: dirty hack to allow dist building
+# source: http://bugs.python.org/issue8876
+import os
+del os.link
+
 import sys
 from setuptools import setup, find_packages
 from touchpaper._version import get_version
