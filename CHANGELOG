@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2.3 (January 31st, 2014)
+--------------------------
+
+* Improved: Adding python version support information to setup.py
+
 0.2.2 (January 31st, 2014)
 --------------------------
 
