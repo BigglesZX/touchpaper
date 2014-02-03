@@ -32,4 +32,4 @@ bc. $ touchpaper --dry-run
 
 h2. Feedback
 
-touchpaper is a work in progress and some features do not yet work properly in all scenarios. You're welcome to submit issues via Github, nonetheless, and I'll endeavour to include a roadmap at some point that illustrates which bits I know to be only partially functional at this time. I welcome your feedback and contributions, and indeed any attention to this project at all. Thank you.
+touchpaper is a work in progress and some features do not yet work properly in all scenarios. You're welcome to submit issues via Github, nonetheless, and the open enhancement issues I've got currently filed will hopefully illustrate which bits I know to be only partially developed at this time. I welcome your feedback and contributions, and indeed any attention to this project at all. Thank you.
