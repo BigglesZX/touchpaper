@@ -5,9 +5,9 @@ from .utils import (choice_prompt,
 
 def prompt_for_ami(config):
     '''
-    Read the list of favourite AMIs from config, if present, and prompt the 
+    Read the list of favourite AMIs from config, if present, and prompt the
     user for a choice.
-    
+
     They can also enter free text which is treated as an AMI ID.
     '''
     if config and 'favourite_amis' in config and config['favourite_amis']:
@@ -30,7 +30,7 @@ def prompt_for_atp():
 
 def prompt_for_availability_zone(conn):
     '''
-    Get a list of availability zones from the active connection/region and 
+    Get a list of availability zones from the active connection/region and
     prompt the user
     '''
     available_zones = conn.get_all_zones()
@@ -40,7 +40,7 @@ def prompt_for_availability_zone(conn):
 def prompt_for_credentials(config):
     '''
     Prompt the user to choose from AWS credentials from the config
-    
+
     FIXME: catch missing field in config file
     '''
     selection = choice_prompt([x['name'] for x in config['aws_credentials']], 'Please select a set of AWS credentials:')
@@ -57,7 +57,7 @@ def prompt_for_instance_type():
 
 def prompt_for_keypair(conn):
     '''
-    Get a list of all keypairs from the current connection and prompt for 
+    Get a list of all keypairs from the current connection and prompt for
     which to use
     '''
     available_keypairs = conn.get_all_key_pairs()
@@ -68,7 +68,7 @@ def prompt_for_keypair(conn):
 
 def prompt_for_regions(conn):
     '''
-    Get a list of available regions from the current connection and prompt 
+    Get a list of available regions from the current connection and prompt
     the user for a choice
     '''
     available_regions = conn.get_all_regions()
@@ -77,9 +77,9 @@ def prompt_for_regions(conn):
 
 def prompt_for_security_group(conn):
     '''
-    Get a list of available security groups from the current connection and 
+    Get a list of available security groups from the current connection and
     prompt the user to choose one
-    
+
     TODO: option to create new security group with sensible defaults
     '''
     available_security_groups = conn.get_all_security_groups()
@@ -91,7 +91,7 @@ def prompt_for_security_group(conn):
 def prompt_for_storage():
     '''
     Prompt the user to enter a size for a new EBS volume.
-    
+
     If they enter 0 or nothing, return False, which skips volume creation.
     '''
     print "If you want to create and attach an EBS volume to this instance, enter its size in GB."
@@ -110,16 +110,13 @@ def prompt_for_storage_name():
     return name or False
 
 
-def prompt_for_tags():
+def prompt_for_tags(config):
     '''
-    Prompt the user for a name for the instance.
-    
-    In the near future this function will support prompting for more tags, 
-    with definitions for those being loaded from config.
-    
-    TODO: load local definition of common fields to prompt for (e.g. name)
+    Prompt the user to enter tags for the instance, as specified in the config
     '''
-    name = text_prompt('Enter a name for the instance:')
-    return {
-        'Name': name,
-    }
+    tags = {}
+    for tag in config['tags']:
+        name = tag['name']
+        value = text_prompt('Enter value for tag "%s":' % name)
+        tags[name] = value
+    return tags
