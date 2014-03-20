@@ -5,24 +5,16 @@ run `touchpaper` on the command line.
 
 import boto.ec2
 import sys
+import touchpaper.settings as settings
+
 from boto.ec2 import EC2Connection
 from colorama import init, Fore
 from os import environ
 from time import sleep
+
 from ._version import get_version
 from .prompts import *
 from .utils import argument_parser, choice_prompt, find_config
-
-
-'''
-Some useful config vars
-
-These will probably be moved into a more organised config setup in the future
-'''
-RC_FILE_NAME = '.touchpaperrc'
-AWS_KEY_ENV_VAR = 'AWS_ACCESS_KEY_ID'
-AWS_SECRET_ENV_VAR = 'AWS_SECRET_ACCESS_KEY'
-RUNNING_STATE = 'running'
 
 
 '''
@@ -48,8 +40,8 @@ def main():
 
     ''' Check results of config discovery and warn if env vars aren't set '''
     config = find_config(args.config_file_location)
-    if config is False and (AWS_KEY_ENV_VAR not in environ or AWS_SECRET_ENV_VAR not in environ):
-        print Fore.RED + "Error: you're not using %s, so you need to configure the %s and %s variables in your environment." % (RC_FILE_NAME, AWS_KEY_ENV_VAR, AWS_SECRET_ENV_VAR)
+    if config is False and (settings.AWS_KEY_ENV_VAR not in environ or settings.AWS_SECRET_ENV_VAR not in environ):
+        print Fore.RED + "Error: you're not using %s, so you need to configure the %s and %s variables in your environment." % (settings.RC_FILE_NAME, settings.AWS_KEY_ENV_VAR, settings.AWS_SECRET_ENV_VAR)
         sys.exit(1)
 
     ''' Set up initial EC2 connection '''
@@ -139,7 +131,7 @@ def main():
     instance = reservation.instances[0]
 
     ''' Wait until the instance reports a running state '''
-    while instance.state != RUNNING_STATE:
+    while instance.state != settings.RUNNING_STATE:
         print "Instance state: %s ..." % instance.state
         sleep(5)
         instance.update()

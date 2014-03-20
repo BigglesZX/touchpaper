@@ -35,7 +35,7 @@ setup(
         ]
     },
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: System Administrators',
         'Operating System :: MacOS :: MacOS X',
