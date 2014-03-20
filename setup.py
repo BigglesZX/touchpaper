@@ -2,6 +2,7 @@
 
 # FIXME: dirty hack to allow dist building on vagrant
 # source: http://bugs.python.org/issue8876
+# to build: $ python setup.py register sdist upload
 import os
 del os.link
 
