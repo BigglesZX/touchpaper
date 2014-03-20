@@ -11,6 +11,7 @@ Changelog
 --------------------------
 
 * New: Added some not entirely worthwhile tests
+* Fixed: AMI ID prompt should now correctly accept an ID string as input
 
 0.2.4 (March 20th, 2014)
 --------------------------
