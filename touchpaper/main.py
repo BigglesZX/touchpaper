@@ -107,9 +107,10 @@ def main():
     if security_group is False:
         print Fore.RED + "Warning: no security groups found on account, you will not be able to access the new instance via the network"
 
-    if config and config['tags']:
+    if config and 'tags' in config:
         tags = prompt_for_tags(config)
     else:
+        tags = None
         print Fore.YELLOW + "Warning: no tags defined in config"
 
     ''' Regurgitate selected parameters for user confirmation '''
@@ -122,16 +123,20 @@ def main():
     print "Storage: %s" % (('%dGB EBS' % storage) if storage else "None")
     print "Keypair: %s" % (keypair.name if keypair else "None")
     #print "Security group: %s" % security_group.name
-    print "Tags: %s" % tags
+    if tags:
+        print "Tags:"
+        for tag, value in tags.iteritems():
+            print '- "%s": "%s"' % (tag, value)
 
     if not bool(choice_prompt(['No', 'Yes'], 'About to launch the instance. Are these details correct?')):
+        print Fore.YELLOW + "Quitting"
         sys.exit(0)
 
     print Fore.CYAN + "Launching instance..."
 
     ''' Request a reservation with the selected parameters '''
     reservation = conn.run_instances(image_id=ami,
-                                     key_name=keypair.name,
+                                     key_name=keypair.name if keypair else None,
                                      security_groups=[security_group.name,],
                                      instance_type=instance_type,
                                      placement=availability_zone.name,
