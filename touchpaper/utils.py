@@ -1,11 +1,9 @@
 import argparse
 import json
+import touchpaper.settings as settings
+
 from os import getcwd
 from os.path import exists, expanduser, join
-
-
-# FIXME: DRY
-RC_FILE_NAME = '.touchpaperrc'
 
 
 def argument_parser():
@@ -46,8 +44,8 @@ def find_config(config_file_location_override):
     Search the current user's home directory, or the current directory, for
     our rc file. If found, attempt to parse it.
     '''
-    local_config_path = join(getcwd(), RC_FILE_NAME)
-    home_config_path = join(expanduser('~'), RC_FILE_NAME)
+    local_config_path = join(getcwd(), settings.RC_FILE_NAME)
+    home_config_path = join(expanduser('~'), settings.RC_FILE_NAME)
     config_path = False
     config = False
 
