@@ -3,7 +3,6 @@ This is the primary touchpaper module; the `main` function is called when you
 run `touchpaper` on the command line.
 '''
 
-import argparse
 import boto.ec2
 import sys
 from boto.ec2 import EC2Connection
@@ -12,7 +11,7 @@ from os import environ
 from time import sleep
 from ._version import get_version
 from .prompts import *
-from .utils import choice_prompt, find_config
+from .utils import argument_parser, choice_prompt, find_config
 
 
 '''
@@ -36,16 +35,8 @@ def main():
     ''' Colorama init '''
     init(autoreset=True)
 
-    ''' Parse command-line args for run-time options '''
-    parser = argparse.ArgumentParser(description='Asks a series of questions '
-                                                 'to configure and launch an '
-                                                 'AWS EC2 instance')
-    parser.add_argument('-c', '--config', dest='config_file_location',
-                        action='store', help='override location of config file')
-    parser.add_argument('-d', '--dry-run', dest='dry_run', action='store_true',
-                        help='enable dry-run mode in the AWS API')
-    parser.add_argument('-v', '--version', dest='version', action='store_true',
-                        help='show package version information and exit')
+    ''' Argument parser init '''
+    parser = argument_parser()
     args = parser.parse_args()
 
     if args.version:
@@ -69,7 +60,7 @@ def main():
         print Fore.YELLOW + "Using AWS credentials from environment"
         conn = EC2Connection()
 
-    region = prompt_for_regions(conn)
+    region = prompt_for_region(conn)
 
     ''' Establish region using selected credentials, or default to environment
     variables '''

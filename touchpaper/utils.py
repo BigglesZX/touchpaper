@@ -1,3 +1,4 @@
+import argparse
 import json
 from os import getcwd
 from os.path import exists, expanduser, join
@@ -7,7 +8,23 @@ from os.path import exists, expanduser, join
 RC_FILE_NAME = '.touchpaperrc'
 
 
-def choice_prompt(choices, prompt, **args):
+def argument_parser():
+    '''
+    Parse command-line args for run-time options
+    '''
+    parser = argparse.ArgumentParser(description='Asks a series of questions '
+                                                 'to configure and launch an '
+                                                 'AWS EC2 instance')
+    parser.add_argument('-c', '--config', dest='config_file_location',
+                        action='store', help='override location of config file')
+    parser.add_argument('-d', '--dry-run', dest='dry_run', action='store_true',
+                        help='enable dry-run mode in the AWS API')
+    parser.add_argument('-v', '--version', dest='version', action='store_true',
+                        help='show package version information and exit')
+    return parser
+
+
+def choice_prompt(choices, prompt, **kwargs):
     '''
     Present the user with some numbered choices and accept input to make a
     selection
@@ -18,6 +35,9 @@ def choice_prompt(choices, prompt, **args):
     for i, choice in enumerate(choices):
         print " %d ) %s" % (i, choice)
     selection = raw_input("Enter your choice: ")
+
+    if 'no_cast' in kwargs and kwargs['no_cast'] == True:
+        return selection
     return int(selection)
 
 
