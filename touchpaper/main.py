@@ -40,6 +40,8 @@ def main():
     parser = argparse.ArgumentParser(description='Asks a series of questions '
                                                  'to configure and launch an '
                                                  'AWS EC2 instance')
+    parser.add_argument('-c', '--config', dest='config_file_location',
+                        action='store', help='override location of config file')
     parser.add_argument('-d', '--dry-run', dest='dry_run', action='store_true',
                         help='enable dry-run mode in the AWS API')
     parser.add_argument('-v', '--version', dest='version', action='store_true',
@@ -54,7 +56,7 @@ def main():
         print Fore.YELLOW + "Warning: dry-run mode is active"
 
     ''' Check results of config discovery and warn if env vars aren't set '''
-    config = find_config()
+    config = find_config(args.config_file_location)
     if config is False and (AWS_KEY_ENV_VAR not in environ or AWS_SECRET_ENV_VAR not in environ):
         print Fore.RED + "Error: you're not using %s, so you need to configure the %s and %s variables in your environment." % (RC_FILE_NAME, AWS_KEY_ENV_VAR, AWS_SECRET_ENV_VAR)
         sys.exit(1)
