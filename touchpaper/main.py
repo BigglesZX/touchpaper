@@ -60,7 +60,7 @@ def main():
         print Fore.YELLOW + "Using AWS credentials from environment"
         conn = EC2Connection()
 
-    region = prompt_for_regions(conn)
+    region = prompt_for_region(conn)
 
     ''' Establish region using selected credentials, or default to environment
     variables '''

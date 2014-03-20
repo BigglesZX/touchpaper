@@ -24,7 +24,7 @@ def argument_parser():
     return parser
 
 
-def choice_prompt(choices, prompt, **args):
+def choice_prompt(choices, prompt, **kwargs):
     '''
     Present the user with some numbered choices and accept input to make a
     selection
@@ -35,6 +35,9 @@ def choice_prompt(choices, prompt, **args):
     for i, choice in enumerate(choices):
         print " %d ) %s" % (i, choice)
     selection = raw_input("Enter your choice: ")
+
+    if 'no_cast' in kwargs and kwargs['no_cast'] == True:
+        return selection
     return int(selection)
 
 

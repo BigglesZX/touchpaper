@@ -12,7 +12,7 @@ def prompt_for_ami(config):
     '''
     if config and 'favourite_amis' in config and config['favourite_amis']:
         favourite_amis = ["%s: %s" % (k, v) for k, v in config['favourite_amis'].iteritems()]
-        selection = choice_prompt(favourite_amis, 'Please select an AMI or enter an AMI ID:')
+        selection = choice_prompt(favourite_amis, 'Please select an AMI or enter an AMI ID:', no_cast=True)
         if isinstance(selection, int):
             return favourite_amis[selection].split(':')[0]
         else:
@@ -66,7 +66,7 @@ def prompt_for_keypair(conn):
     return available_keypairs[choice_prompt([x.name for x in available_keypairs], 'Please select a keypair:')]
 
 
-def prompt_for_regions(conn):
+def prompt_for_region(conn):
     '''
     Get a list of available regions from the current connection and prompt
     the user for a choice

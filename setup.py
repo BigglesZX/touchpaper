@@ -1,10 +1,19 @@
 #!/usr/bin/env python
 
+
 # FIXME: dirty hack to allow dist building on vagrant
 # source: http://bugs.python.org/issue8876
 # to build: $ python setup.py register sdist upload
 import os
 del os.link
+
+# FIXME: hack to prevent stack trace at the end of nose test run
+# source: http://bugs.python.org/issue15881#msg170215
+try:
+    import multiprocessing
+except ImportError:
+    pass
+
 
 import sys
 from setuptools import setup, find_packages
