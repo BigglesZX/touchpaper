@@ -10,5 +10,10 @@
         "ami-aa56a1dd": "Alestic - eu-west-1 - 12.04 LTS - EBS",
         "ami-3a689f4d": "Alestic - eu-west-1 - 12.04 LTS - instance store"
     },
+    "tags": [
+        {
+            "name": "Name"
+        }
+    ],
     "defaults": {}
 }

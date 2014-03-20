@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.2.4 (March 20th, 2014)
+--------------------------
+
+* New: Config file can now specify list of tags to prompt for during box setup
+* New: Override location of config file with -c or --config option
+
 0.2.3 (January 31st, 2014)
 --------------------------
 
