@@ -16,6 +16,8 @@ setup(
     author='James Tiplady',
     url='http://github.com/BigglesZX/touchpaper',
     packages=find_packages(),
+    test_suite='nose.collector',
+    tests_require=['nose==1.3.1',],
     install_requires=['boto==2.23.0', 'colorama==0.2.7'],
     entry_points={
         'console_scripts': [
