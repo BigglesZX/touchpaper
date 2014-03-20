@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.2.6 (March 20th, 2014)
+--------------------------
+
+* Improved: Deduplicated and tidied some configuration variables
+* Improved: Adjusted PyPi list classifiers to put touchpaper in beta, woo!
+
 0.2.5 (March 20th, 2014)
 --------------------------
 
