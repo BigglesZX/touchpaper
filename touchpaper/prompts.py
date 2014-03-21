@@ -1,17 +1,21 @@
+from .config import get_config
 from .utils import (choice_prompt,
                     get_instance_types,
                     text_prompt)
 
 
-def prompt_for_ami(config):
+config = get_config()
+
+
+def prompt_for_ami():
     '''
     Read the list of favourite AMIs from config, if present, and prompt the
     user for a choice.
 
     They can also enter free text which is treated as an AMI ID.
     '''
-    if config and 'favourite_amis' in config and config['favourite_amis']:
-        favourite_amis = ["%s: %s" % (k, v) for k, v in config['favourite_amis'].iteritems()]
+    if config.data and 'favourite_amis' in config.data and config.data['favourite_amis']:
+        favourite_amis = ["%s: %s" % (k, v) for k, v in config.data['favourite_amis'].iteritems()]
         selection = choice_prompt(favourite_amis, 'Please select an AMI or enter an AMI ID:', no_cast=True)
         if isinstance(selection, int):
             return favourite_amis[selection].split(':')[0]
@@ -37,14 +41,14 @@ def prompt_for_availability_zone(conn):
     return available_zones[choice_prompt([x.name for x in available_zones], 'Please select a target availability zone:')]
 
 
-def prompt_for_credentials(config):
+def prompt_for_credentials():
     '''
     Prompt the user to choose from AWS credentials from the config
 
     FIXME: catch missing field in config file
     '''
-    selection = choice_prompt([x['name'] for x in config['aws_credentials']], 'Please select a set of AWS credentials:')
-    return (config['aws_credentials'][selection]['key'], config['aws_credentials'][selection]['secret'])
+    selection = choice_prompt([x['name'] for x in config.data['aws_credentials']], 'Please select a set of AWS credentials:')
+    return (config.data['aws_credentials'][selection]['key'], config.data['aws_credentials'][selection]['secret'])
 
 
 def prompt_for_instance_type():
@@ -110,12 +114,12 @@ def prompt_for_storage_name():
     return name or False
 
 
-def prompt_for_tags(config):
+def prompt_for_tags():
     '''
     Prompt the user to enter tags for the instance, as specified in the config
     '''
     tags = {}
-    for tag in config['tags']:
+    for tag in config.data['tags']:
         name = tag['name']
         value = text_prompt('Enter value for tag "%s":' % name)
         tags[name] = value
