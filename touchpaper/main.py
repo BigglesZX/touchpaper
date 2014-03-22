@@ -107,13 +107,13 @@ def main():
     print "Accidental termination protection: %s" % ("Yes" if atp else "No")
     print "Storage: %s" % (('%dGB EBS' % storage) if storage else "None")
     print "Keypair: %s" % (keypair.name if keypair else "None")
-    #print "Security group: %s" % security_group.name
+    print "Security group: %s" % security_group.name
     if tags:
         print "Tags:"
         for tag, value in tags.iteritems():
             print '- "%s": "%s"' % (tag, value)
 
-    if not bool(choice_prompt(['No', 'Yes'], 'About to launch the instance. Are these details correct?')):
+    if not bool(choice_prompt(['No', 'Yes'], 'Are these details correct?')):
         print Fore.YELLOW + "Quitting"
         sys.exit(0)
 
