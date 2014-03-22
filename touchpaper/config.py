@@ -51,9 +51,10 @@ class Config():
         Parse the config file
         '''
         self.path = self.find()
-        with open(self.path) as f:
-            data = json.load(f)
-            self.data = data
+        if self.path:
+            with open(self.path) as f:
+                data = json.load(f)
+                self.data = data
         return self
 
     def set_default(self, name, value):
