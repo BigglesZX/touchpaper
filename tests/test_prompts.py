@@ -1,5 +1,9 @@
 import mock
 
+from touchpaper.config import get_config
+
+
+config = get_config()
 
 SAMPLE_AMI_CONFIG = {
     "favourite_amis": {
@@ -26,7 +30,7 @@ def test_prompt_for_ami_noconfig():
     '''
     with mock.patch('__builtin__.raw_input', return_value='foo'):
         from touchpaper.prompts import prompt_for_ami
-        assert prompt_for_ami(False) == 'foo'
+        assert prompt_for_ami() == 'foo'
 
 
 def test_prompt_for_ami_config_freetext():
@@ -35,7 +39,8 @@ def test_prompt_for_ami_config_freetext():
     '''
     with mock.patch('__builtin__.raw_input', return_value='foo'):
         from touchpaper.prompts import prompt_for_ami
-        assert prompt_for_ami(SAMPLE_AMI_CONFIG) == 'foo'
+        config.data = SAMPLE_AMI_CONFIG
+        assert prompt_for_ami() == 'foo'
 
 
 def test_prompt_for_ami_config_selection():
@@ -44,8 +49,9 @@ def test_prompt_for_ami_config_selection():
     '''
     with mock.patch('__builtin__.raw_input', return_value=0):
         from touchpaper.prompts import prompt_for_ami
-        selection = prompt_for_ami(SAMPLE_AMI_CONFIG)
-        for k, v in SAMPLE_AMI_CONFIG['favourite_amis'].iteritems():
+        config.data = SAMPLE_AMI_CONFIG
+        selection = prompt_for_ami()
+        for k, v in config.data['favourite_amis'].iteritems():
             first = k
             break
         assert selection == k
@@ -201,6 +207,7 @@ def test_prompt_for_tags():
     '''
     with mock.patch('__builtin__.raw_input', return_value='foo'):
         from touchpaper.prompts import prompt_for_tags
-        tags = prompt_for_tags(SAMPLE_TAG_CONFIG)
+        config.data = SAMPLE_TAG_CONFIG
+        tags = prompt_for_tags()
         assert 'Name' in tags
         assert 'OS' in tags

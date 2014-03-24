@@ -1,9 +1,4 @@
 import argparse
-import json
-import touchpaper.settings as settings
-
-from os import getcwd
-from os.path import exists, expanduser, join
 
 
 def argument_parser():
@@ -27,41 +22,22 @@ def choice_prompt(choices, prompt, **kwargs):
     Present the user with some numbered choices and accept input to make a
     selection
 
-    TODO: 'default' option implementation
+    FIXME: catch selection of invalid choice
     '''
     print prompt
     for i, choice in enumerate(choices):
         print " %d ) %s" % (i, choice)
-    selection = raw_input("Enter your choice: ")
 
-    if 'no_cast' in kwargs and kwargs['no_cast'] == True:
+    if kwargs.get('default') is not None:
+        selection = raw_input("Enter your choice [%s]: " % kwargs['default'])
+        if selection == '':
+            selection = kwargs['default']
+    else:
+        selection = raw_input("Enter your choice: ")
+
+    if kwargs.get('no_cast', False):
         return selection
     return int(selection)
-
-
-def find_config(config_file_location_override):
-    '''
-    Search the current user's home directory, or the current directory, for
-    our rc file. If found, attempt to parse it.
-    '''
-    local_config_path = join(getcwd(), settings.RC_FILE_NAME)
-    home_config_path = join(expanduser('~'), settings.RC_FILE_NAME)
-    config_path = False
-    config = False
-
-    if config_file_location_override:
-        if exists(config_file_location_override):
-            config_path = config_file_location_override
-    else:
-        if exists(local_config_path):
-            config_path = local_config_path
-        elif exists(home_config_path):
-            config_path = home_config_path
-
-    if config_path:
-        with open(config_path) as f:
-            config = json.load(f)
-    return config
 
 
 def get_instance_types():
@@ -100,7 +76,7 @@ def get_instance_types():
     ]
 
 
-def text_prompt(prompt, **args):
+def text_prompt(prompt, **kwargs):
     '''
     Show the user a text prompt and return their response
 
