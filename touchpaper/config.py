@@ -72,8 +72,9 @@ class Config():
         '''
         Write the updated config data out to the original config file
         '''
-        with open(self.path, 'w') as f:
-            json.dump(self.data, f, sort_keys=True, indent=4)
+        if self.path:
+            with open(self.path, 'w') as f:
+                json.dump(self.data, f, sort_keys=True, indent=4)
         return self
 
 
