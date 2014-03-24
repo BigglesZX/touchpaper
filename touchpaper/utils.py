@@ -23,11 +23,17 @@ def choice_prompt(choices, prompt, **kwargs):
     selection
 
     TODO: 'default' option implementation
+    TODO: catch selection of invalid choice
     '''
     print prompt
     for i, choice in enumerate(choices):
         print " %d ) %s" % (i, choice)
-    selection = raw_input("Enter your choice: ")
+    if 'default' in kwargs and kwargs['default'] is not None:
+        selection = raw_input("Enter your choice [%s]: " % kwargs['default'])
+        if selection == '':
+            selection = kwargs['default']
+    else:
+        selection = raw_input("Enter your choice: ")
 
     if 'no_cast' in kwargs and kwargs['no_cast'] == True:
         return selection

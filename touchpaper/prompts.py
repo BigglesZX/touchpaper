@@ -47,7 +47,9 @@ def prompt_for_credentials():
 
     FIXME: catch missing field in config file
     '''
-    selection = choice_prompt([x['name'] for x in config.data['aws_credentials']], 'Please select a set of AWS credentials:')
+    choices = [x['name'] for x in config.data['aws_credentials']]
+    selection = choice_prompt(choices, 'Please select a set of AWS credentials:', default=config.get_default('credentials'))
+    config.set_default('credentials', selection)
     return (config.data['aws_credentials'][selection]['key'], config.data['aws_credentials'][selection]['secret'])
 
 
