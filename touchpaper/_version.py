@@ -1,5 +1,5 @@
 ''' The canonical package version '''
-__version_info__ = ('0', '2', '6')
+__version_info__ = ('0', '2', '7')
 __version__ = '.'.join(__version_info__)
 
 

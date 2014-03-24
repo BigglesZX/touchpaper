@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.2.7 (March 24th, 2014)
+--------------------------
+
+* New: Prompts now save the last input into the rc file and offer it as a default
+* Improved: Refactored config handling behind the scenes
+* Fixed: Improved resilience of various prompts
+
 0.2.6 (March 20th, 2014)
 --------------------------
 
