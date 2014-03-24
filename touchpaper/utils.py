@@ -22,20 +22,20 @@ def choice_prompt(choices, prompt, **kwargs):
     Present the user with some numbered choices and accept input to make a
     selection
 
-    TODO: 'default' option implementation
-    TODO: catch selection of invalid choice
+    FIXME: catch selection of invalid choice
     '''
     print prompt
     for i, choice in enumerate(choices):
         print " %d ) %s" % (i, choice)
-    if 'default' in kwargs and kwargs['default'] is not None:
+
+    if kwargs.get('default') is not None:
         selection = raw_input("Enter your choice [%s]: " % kwargs['default'])
         if selection == '':
             selection = kwargs['default']
     else:
         selection = raw_input("Enter your choice: ")
 
-    if 'no_cast' in kwargs and kwargs['no_cast'] == True:
+    if kwargs.get('no_cast', False):
         return selection
     return int(selection)
 
@@ -76,7 +76,7 @@ def get_instance_types():
     ]
 
 
-def text_prompt(prompt, **args):
+def text_prompt(prompt, **kwargs):
     '''
     Show the user a text prompt and return their response
 

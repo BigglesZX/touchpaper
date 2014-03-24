@@ -42,8 +42,8 @@ class Config():
         '''
         Return a default value for a given prompt from config data
         '''
-        if self.data and name in self.data:
-            return self.data[name]
+        if self.data and 'defaults' in self.data and name in self.data['defaults']:
+            return self.data['defaults'][name]
         return None
 
     def load(self, **kwargs):
@@ -61,8 +61,10 @@ class Config():
         '''
         Update the stored default value for a given prompt
         '''
-        if self.data and name in self.data:
-            self.data[name] = value
+        if self.data:
+            if 'defaults' not in self.data:
+                self.data['defaults'] = {}
+            self.data['defaults'][name] = value
             self.save()
         return self
 
@@ -71,7 +73,7 @@ class Config():
         Write the updated config data out to the original config file
         '''
         with open(self.path, 'w') as f:
-            json.dump(self.data, f, sort_keys=True, indent=1)
+            json.dump(self.data, f, sort_keys=True, indent=4)
         return self
 
 

@@ -14,12 +14,20 @@ def prompt_for_ami():
 
     They can also enter free text which is treated as an AMI ID.
     '''
-    if config.data and 'favourite_amis' in config.data and config.data['favourite_amis']:
+    if config.data and config.data.get('favourite_amis', False):
         favourite_amis = ["%s: %s" % (k, v) for k, v in config.data['favourite_amis'].iteritems()]
-        selection = choice_prompt(favourite_amis, 'Please select an AMI or enter an AMI ID:', no_cast=True)
-        if isinstance(selection, int):
+        selection = choice_prompt(favourite_amis,
+                                  'Please select an AMI or enter an AMI ID:',
+                                  no_cast=True,
+                                  default=config.get_default('ami'))
+        if isinstance(selection, int) or selection.isdigit():
+            selection = int(selection)
+            config.set_default('ami', selection)
             return favourite_amis[selection].split(':')[0]
         else:
+            # selection is a string, hopefully an AMI ID
+            if selection == '':
+                raise ValueError("No selection or AMI ID specified")
             return selection
     else:
         return text_prompt('Please enter an AMI ID:')
@@ -29,7 +37,11 @@ def prompt_for_atp():
     '''
     Simple yes/no prompt for enabling Accidental Termination Protection
     '''
-    return bool(choice_prompt(['No', 'Yes'], 'Do you want to enable Accidental Termination Protection?'))
+    selection = choice_prompt(['No', 'Yes'],
+                              'Do you want to enable Accidental Termination Protection?',
+                              default=config.get_default('atp'))
+    config.set_default('atp', selection)
+    return bool(selection)
 
 
 def prompt_for_availability_zone(conn):
@@ -38,7 +50,11 @@ def prompt_for_availability_zone(conn):
     prompt the user
     '''
     available_zones = conn.get_all_zones()
-    return available_zones[choice_prompt([x.name for x in available_zones], 'Please select a target availability zone:')]
+    selection = choice_prompt([x.name for x in available_zones],
+                              'Please select a target availability zone:',
+                              default=config.get_default('availability_zone'))
+    config.set_default('availability_zone', selection)
+    return available_zones[selection]
 
 
 def prompt_for_credentials():
@@ -48,9 +64,12 @@ def prompt_for_credentials():
     FIXME: catch missing field in config file
     '''
     choices = [x['name'] for x in config.data['aws_credentials']]
-    selection = choice_prompt(choices, 'Please select a set of AWS credentials:', default=config.get_default('credentials'))
+    selection = choice_prompt(choices,
+                              'Please select a set of AWS credentials:',
+                              default=config.get_default('credentials'))
     config.set_default('credentials', selection)
-    return (config.data['aws_credentials'][selection]['key'], config.data['aws_credentials'][selection]['secret'])
+    return (config.data['aws_credentials'][selection]['key'],
+            config.data['aws_credentials'][selection]['secret'])
 
 
 def prompt_for_instance_type():
@@ -58,7 +77,11 @@ def prompt_for_instance_type():
     Prompt the user to choose from the local list of available instance types
     '''
     instance_types = get_instance_types()
-    return instance_types[choice_prompt(instance_types, 'Please select an instance type:')]
+    selection = choice_prompt(instance_types,
+                              'Please select an instance type:',
+                              default=config.get_default('instance_type'))
+    config.set_default('instance_type', selection)
+    return instance_types[selection]
 
 
 def prompt_for_keypair(conn):
@@ -69,7 +92,11 @@ def prompt_for_keypair(conn):
     available_keypairs = conn.get_all_key_pairs()
     if not available_keypairs:
         return False
-    return available_keypairs[choice_prompt([x.name for x in available_keypairs], 'Please select a keypair:')]
+    selection = choice_prompt([x.name for x in available_keypairs],
+                              'Please select a keypair:',
+                              default=config.get_default('keypair'))
+    config.set_default('keypair', selection)
+    return available_keypairs[selection]
 
 
 def prompt_for_region(conn):
@@ -78,7 +105,11 @@ def prompt_for_region(conn):
     the user for a choice
     '''
     available_regions = conn.get_all_regions()
-    return available_regions[choice_prompt([x.name for x in available_regions], 'Please select a target region:')]
+    selection = choice_prompt([x.name for x in available_regions],
+                              'Please select a target region:',
+                              default=config.get_default('region'))
+    config.set_default('region', selection)
+    return available_regions[selection]
 
 
 def prompt_for_security_group(conn):
@@ -91,7 +122,11 @@ def prompt_for_security_group(conn):
     available_security_groups = conn.get_all_security_groups()
     if not available_security_groups:
         return False
-    return available_security_groups[choice_prompt([x.name for x in available_security_groups], 'Please select a security group:')]
+    selection = choice_prompt([x.name for x in available_security_groups],
+                              'Please select a security group:',
+                              default=config.get_default('security_group'))
+    config.set_default('security_group', selection)
+    return available_security_groups[selection]
 
 
 def prompt_for_storage():

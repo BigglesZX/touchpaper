@@ -103,7 +103,7 @@ def main():
         print Fore.YELLOW + "Warning: no tags defined in config"
 
     ''' Regurgitate selected parameters for user confirmation '''
-    print Fore.GREEN + "Ready to launch instance. You selected the following:"
+    print Fore.GREEN + "\nReady to launch instance. You selected the following:"
     print "Region: %s" % region.name
     print "Availability zone: %s" % availability_zone.name
     print "AMI: %s" % ami
