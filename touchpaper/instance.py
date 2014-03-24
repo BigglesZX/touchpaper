@@ -1,7 +1,7 @@
 import boto.ec2
 
 
-class Instance():
+class Instance:
     region = None
     availability_zone = None
     ami = None
