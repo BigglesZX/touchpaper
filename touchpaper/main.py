@@ -14,7 +14,7 @@ from time import sleep
 from ._version import get_version
 from .config import get_config
 from .prompts import *
-from .utils import argument_parser, choice_prompt
+from .utils import get_argument_parser, choice_prompt
 
 
 config = get_config()
@@ -31,7 +31,7 @@ def main():
     init(autoreset=True)
 
     ''' Argument parser init '''
-    parser = argument_parser()
+    parser = get_argument_parser()
     args = parser.parse_args()
 
     if args.version:

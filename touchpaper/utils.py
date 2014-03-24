@@ -1,22 +1,6 @@
 import argparse
 
 
-def argument_parser():
-    '''
-    Parse command-line args for run-time options
-    '''
-    parser = argparse.ArgumentParser(description='Asks a series of questions '
-                                                 'to configure and launch an '
-                                                 'AWS EC2 instance')
-    parser.add_argument('-c', '--config', dest='config_file_location',
-                        action='store', help='override location of config file')
-    parser.add_argument('-d', '--dry-run', dest='dry_run', action='store_true',
-                        help='enable dry-run mode in the AWS API')
-    parser.add_argument('-v', '--version', dest='version', action='store_true',
-                        help='show package version information and exit')
-    return parser
-
-
 def choice_prompt(choices, prompt, **kwargs):
     '''
     Present the user with some numbered choices and accept input to make a
@@ -38,6 +22,22 @@ def choice_prompt(choices, prompt, **kwargs):
     if kwargs.get('no_cast', False):
         return selection
     return int(selection)
+
+
+def get_argument_parser():
+    '''
+    Parse command-line args for run-time options
+    '''
+    parser = argparse.ArgumentParser(description='Asks a series of questions '
+                                                 'to configure and launch an '
+                                                 'AWS EC2 instance')
+    parser.add_argument('-c', '--config', dest='config_file_location',
+                        action='store', help='override location of config file')
+    parser.add_argument('-d', '--dry-run', dest='dry_run', action='store_true',
+                        help='enable dry-run mode in the AWS API')
+    parser.add_argument('-v', '--version', dest='version', action='store_true',
+                        help='show package version information and exit')
+    return parser
 
 
 def get_instance_types():
