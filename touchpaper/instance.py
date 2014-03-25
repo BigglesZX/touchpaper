@@ -1,5 +1,10 @@
 import boto.ec2
 
+from .config import get_config
+
+
+config = get_config()
+
 
 class Instance:
     region = None
@@ -22,7 +27,6 @@ class Instance:
         ''' Pick up dry-run arg if set '''
         if dry_run:
             self._dry_run = True
-        return self
 
     def get(self):
         ''' Return the actual boto instance representation '''
@@ -54,6 +58,22 @@ class Instance:
                                            disable_api_termination=self.atp,
                                            dry_run=self._dry_run)
             self._instance = res.instances[0]
+
+            ''' Wait until the instance reports a running state '''
+            while self._instance.state != config.RUNNING_STATE:
+                print "Instance state: %s ..." % self._instance.state
+                sleep(5)
+                self._instance.update()
+            print Fore.GREEN + "Instance running! ID: %s; public DNS: %s" % (self._instance.id, self._instance.public_dns_name)
+
+            ''' If any tags were entered, add them to the instance now '''
+            if self.tags:
+                self.set_tags()
+                print "Instance tags added"
+
+            ''' If storage was selected and given a name, apply it to the volume '''
+            if self.storage_name:
+                self.set_storage_tag()
         return self
 
     def set_conn(self, conn):
@@ -70,7 +90,7 @@ class Instance:
                 print "EBS volume tags added"
         return self
 
-    def set_tags(self, tags):
+    def set_tags(self):
         ''' Tag the instance '''
         if self.tags:
             for tag, value in self.tags.iteritems():

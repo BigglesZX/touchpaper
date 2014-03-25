@@ -13,6 +13,7 @@ from time import sleep
 
 from ._version import get_version
 from .config import get_config
+from .instance import Instance
 from .prompts import *
 from .utils import get_argument_parser, choice_prompt
 
@@ -56,26 +57,30 @@ def main():
         print Fore.YELLOW + "Using AWS credentials from environment"
         conn = EC2Connection()
 
-    region = prompt_for_region(conn)
+    ''' Instantiate instance '''
+    instance = Instance(args.dry_run)
+
+    instance.region = prompt_for_region(conn)
 
     ''' Establish region using selected credentials, or default to environment
     variables '''
     if config.data:
-        conn = boto.ec2.connect_to_region(region.name, aws_access_key_id=key, aws_secret_access_key=secret)
+        conn = boto.ec2.connect_to_region(instance.region.name, aws_access_key_id=key, aws_secret_access_key=secret)
     else:
-        conn = boto.ec2.connect_to_region(region.name)
+        conn = boto.ec2.connect_to_region(instance.region.name)
 
-    availability_zone = prompt_for_availability_zone(conn)
+    instance.set_conn(conn)
 
-    ami = prompt_for_ami()
+    instance.availability_zone = prompt_for_availability_zone(conn)
 
-    instance_type = prompt_for_instance_type()
+    instance.ami = prompt_for_ami()
 
-    atp = prompt_for_atp()
+    instance.instance_type = prompt_for_instance_type()
 
-    storage = prompt_for_storage()
-    storage_name = False
-    if storage:
+    instance.atp = prompt_for_atp()
+
+    storage_size = prompt_for_storage()
+    if storage_size:
         '''
         If a storage size was specified, prompt for the name to assign to the
         volume and set up the EC2 BlockDeviceMapping ready to attach it to the
@@ -84,37 +89,39 @@ def main():
         storage_name = prompt_for_storage_name()
 
         dev_sda1 = boto.ec2.blockdevicemapping.EBSBlockDeviceType()
-        dev_sda1.size = storage
+        dev_sda1.size = storage_size
         bdm = boto.ec2.blockdevicemapping.BlockDeviceMapping()
         bdm['/dev/sda1'] = dev_sda1
 
-    keypair = prompt_for_keypair(conn)
-    if keypair is False:
+        instance.storage_size = storage_size
+        instance.storage_name = storage_name
+
+    instance.keypair = prompt_for_keypair(conn)
+    if instance.keypair is False:
         print Fore.RED + "Warning: no keypairs found on account, you will not be able to SSH into the new instance"
 
-    security_group = prompt_for_security_group(conn)
-    if security_group is False:
+    instance.security_group = prompt_for_security_group(conn)
+    if instance.security_group is False:
         print Fore.RED + "Warning: no security groups found on account, you will not be able to access the new instance via the network"
 
     if config.data and 'tags' in config.data:
-        tags = prompt_for_tags()
+        instance.tags = prompt_for_tags()
     else:
-        tags = None
         print Fore.YELLOW + "Warning: no tags defined in config"
 
     ''' Regurgitate selected parameters for user confirmation '''
     print Fore.GREEN + "\nReady to launch instance. You selected the following:"
-    print "Region: %s" % region.name
-    print "Availability zone: %s" % availability_zone.name
-    print "AMI: %s" % ami
-    print "Instance type: %s" % instance_type
-    print "Accidental termination protection: %s" % ("Yes" if atp else "No")
-    print "Storage: %s" % (('%dGB EBS' % storage) if storage else "None")
-    print "Keypair: %s" % (keypair.name if keypair else "None")
-    print "Security group: %s" % security_group.name
-    if tags:
+    print "Region: %s" % instance.region.name
+    print "Availability zone: %s" % instance.availability_zone.name
+    print "AMI: %s" % instance.ami
+    print "Instance type: %s" % instance.instance_type
+    print "Accidental termination protection: %s" % ("Yes" if instance.atp else "No")
+    print "Storage: %s" % (('%dGB EBS' % instance.storage_size) if instance.storage_size else "None")
+    print "Keypair: %s" % (instance.keypair.name if instance.keypair else "None")
+    print "Security group: %s" % instance.security_group.name
+    if instance.tags:
         print "Tags:"
-        for tag, value in tags.iteritems():
+        for tag, value in instance.tags.iteritems():
             print '- "%s": "%s"' % (tag, value)
 
     if not bool(choice_prompt(['No', 'Yes'], 'Are these details correct?')):
@@ -123,36 +130,7 @@ def main():
 
     print Fore.CYAN + "Launching instance..."
 
-    ''' Request a reservation with the selected parameters '''
-    reservation = conn.run_instances(image_id=ami,
-                                     key_name=keypair.name if keypair else None,
-                                     security_groups=[security_group.name,],
-                                     instance_type=instance_type,
-                                     placement=availability_zone.name,
-                                     block_device_map=bdm if storage else None,
-                                     disable_api_termination=atp,
-                                     dry_run=args.dry_run)
-    instance = reservation.instances[0]
-
-    ''' Wait until the instance reports a running state '''
-    while instance.state != config.RUNNING_STATE:
-        print "Instance state: %s ..." % instance.state
-        sleep(5)
-        instance.update()
-    print Fore.GREEN + "Instance running! ID: %s; public DNS: %s" % (instance.id, instance.public_dns_name)
-
-    ''' If any tags were entered, add them to the instance now '''
-    if tags:
-        for tag, value in tags.iteritems():
-            instance.add_tag(tag, value)
-        print "Instance tags added"
-
-    ''' If storage was selected and given a name, apply it to the volume '''
-    if storage_name:
-        volumes = conn.get_all_volumes(filters={ 'attachment.instance-id': instance.id })
-        if volumes:
-            volumes[0].add_tag('Name', storage_name)
-            print "EBS volume tags added"
+    instance.run()
 
     ''' That's it! '''
     print "Done."
