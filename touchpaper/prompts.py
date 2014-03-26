@@ -1,3 +1,8 @@
+import boto.ec2
+
+from boto.ec2 import EC2Connection
+from colorama import Fore
+
 from .config import get_config
 from .utils import (choice_prompt,
                     get_instance_types,
@@ -7,7 +12,7 @@ from .utils import (choice_prompt,
 config = get_config()
 
 
-def prompt_for_ami():
+def prompt_for_ami(instance):
     '''
     Read the list of favourite AMIs from config, if present, and prompt the
     user for a choice.
@@ -23,17 +28,19 @@ def prompt_for_ami():
         if isinstance(selection, int) or selection.isdigit():
             selection = int(selection)
             config.set_default('ami', selection)
-            return favourite_amis[selection].split(':')[0]
+            instance.ami = favourite_amis[selection].split(':')[0]
         else:
             # selection is a string, hopefully an AMI ID
             if selection == '':
                 raise ValueError("No selection or AMI ID specified")
-            return selection
+            instance.ami = selection
     else:
-        return text_prompt('Please enter an AMI ID:')
+        instance.ami = text_prompt('Please enter an AMI ID:')
+
+    return instance
 
 
-def prompt_for_atp():
+def prompt_for_atp(instance):
     '''
     Simple yes/no prompt for enabling Accidental Termination Protection
     '''
@@ -41,38 +48,49 @@ def prompt_for_atp():
                               'Do you want to enable Accidental Termination Protection?',
                               default=config.get_default('atp'))
     config.set_default('atp', selection)
-    return bool(selection)
+    instance.atp = bool(selection)
+
+    return instance
 
 
-def prompt_for_availability_zone(conn):
+def prompt_for_availability_zone(instance):
     '''
     Get a list of availability zones from the active connection/region and
     prompt the user
     '''
-    available_zones = conn.get_all_zones()
+    available_zones = instance.conn.get_all_zones()
     selection = choice_prompt([x.name for x in available_zones],
                               'Please select a target availability zone:',
                               default=config.get_default('availability_zone'))
     config.set_default('availability_zone', selection)
-    return available_zones[selection]
+    instance.availability_zone = available_zones[selection]
+    return instance
 
 
-def prompt_for_credentials():
+def prompt_for_credentials(instance):
     '''
-    Prompt the user to choose from AWS credentials from the config
-
-    FIXME: catch missing field in config file
+    Prompt the user to choose from AWS credentials from the config or
+    environment, then set up initial EC2 connection
     '''
-    choices = [x['name'] for x in config.data['aws_credentials']]
-    selection = choice_prompt(choices,
-                              'Please select a set of AWS credentials:',
-                              default=config.get_default('credentials'))
-    config.set_default('credentials', selection)
-    return (config.data['aws_credentials'][selection]['key'],
-            config.data['aws_credentials'][selection]['secret'])
+
+    if config.data and 'aws_credentials' in config.data:
+        choices = [x['name'] for x in config.data['aws_credentials']]
+        selection = choice_prompt(choices,
+                                  'Please select a set of AWS credentials:',
+                                  default=config.get_default('credentials'))
+        config.set_default('credentials', selection)
+
+        instance.key = config.data['aws_credentials'][selection]['key']
+        instance.secret = config.data['aws_credentials'][selection]['secret']
+        instance.conn = EC2Connection(instance.key, instance.secret)
+    else:
+        print Fore.YELLOW + "Using AWS credentials from environment"
+        instance.conn = EC2Connection()
+
+    return instance
 
 
-def prompt_for_instance_type():
+def prompt_for_instance_type(instance):
     '''
     Prompt the user to choose from the local list of available instance types
     '''
@@ -81,83 +99,117 @@ def prompt_for_instance_type():
                               'Please select an instance type:',
                               default=config.get_default('instance_type'))
     config.set_default('instance_type', selection)
-    return instance_types[selection]
+    instance.instance_type = instance_types[selection]
+
+    return instance
 
 
-def prompt_for_keypair(conn):
+def prompt_for_keypair(instance):
     '''
     Get a list of all keypairs from the current connection and prompt for
     which to use
     '''
-    available_keypairs = conn.get_all_key_pairs()
-    if not available_keypairs:
-        return False
-    selection = choice_prompt([x.name for x in available_keypairs],
-                              'Please select a keypair:',
-                              default=config.get_default('keypair'))
-    config.set_default('keypair', selection)
-    return available_keypairs[selection]
+    available_keypairs = instance.conn.get_all_key_pairs()
+    if available_keypairs:
+        selection = choice_prompt([x.name for x in available_keypairs],
+                                  'Please select a keypair:',
+                                  default=config.get_default('keypair'))
+        config.set_default('keypair', selection)
+        instance.keypair = available_keypairs[selection]
+
+    if instance.keypair is None:
+        print Fore.RED + "Warning: no keypairs found on account, you will not be able to SSH into the new instance"
+
+    return instance
 
 
-def prompt_for_region(conn):
+def prompt_for_region(instance):
     '''
     Get a list of available regions from the current connection and prompt
     the user for a choice
     '''
-    available_regions = conn.get_all_regions()
+    available_regions = instance.conn.get_all_regions()
     selection = choice_prompt([x.name for x in available_regions],
                               'Please select a target region:',
                               default=config.get_default('region'))
     config.set_default('region', selection)
-    return available_regions[selection]
+    instance.region = available_regions[selection]
+
+    ''' Establish region using selected credentials, or default to environment
+    variables '''
+    if config.data:
+        instance.conn = boto.ec2.connect_to_region(instance.region.name,
+                                                   aws_access_key_id=instance.key,
+                                                   aws_secret_access_key=instance.secret)
+    else:
+        instance.conn = boto.ec2.connect_to_region(instance.region.name)
+
+    return instance
 
 
-def prompt_for_security_group(conn):
+def prompt_for_security_group(instance):
     '''
     Get a list of available security groups from the current connection and
     prompt the user to choose one
 
     TODO: option to create new security group with sensible defaults
     '''
-    available_security_groups = conn.get_all_security_groups()
-    if not available_security_groups:
-        return False
-    selection = choice_prompt([x.name for x in available_security_groups],
-                              'Please select a security group:',
-                              default=config.get_default('security_group'))
-    config.set_default('security_group', selection)
-    return available_security_groups[selection]
+    available_security_groups = instance.conn.get_all_security_groups()
+    if available_security_groups:
+        selection = choice_prompt([x.name for x in available_security_groups],
+                                  'Please select a security group:',
+                                  default=config.get_default('security_group'))
+        config.set_default('security_group', selection)
+        instance.security_group = available_security_groups[selection]
+
+    if instance.security_group is None:
+        print Fore.RED + "Warning: no security groups found on account, you will not be able to access the new instance via the network"
+
+    return instance
 
 
-def prompt_for_storage():
+def prompt_for_storage(instance):
     '''
     Prompt the user to enter a size for a new EBS volume.
 
-    If they enter 0 or nothing, return False, which skips volume creation.
+    If they enter 0 or nothing skip volume creation.
     '''
     print "If you want to create and attach an EBS volume to this instance, enter its size in GB."
     print "Type 0 or press Enter to skip volume creation."
     size = text_prompt('Size of volume in GB:')
     if size == '' or int(size) == 0:
-        return False
-    return int(size)
+        return instance
+
+    instance.storage_size = int(size)
+    instance.prep_storage()
+
+    return instance
 
 
-def prompt_for_storage_name():
+def prompt_for_storage_name(instance):
     '''
     Prompt the user to name the EBS volume they're creating
     '''
-    name = text_prompt('Enter friendly name for volume:')
-    return name or False
+    if instance.storage_size != 0:
+        name = text_prompt('Enter friendly name for volume:')
+        if name:
+            instance.storage_name = name
+
+    return instance
 
 
-def prompt_for_tags():
+def prompt_for_tags(instance):
     '''
     Prompt the user to enter tags for the instance, as specified in the config
     '''
-    tags = {}
-    for tag in config.data['tags']:
-        name = tag['name']
-        value = text_prompt('Enter value for tag "%s":' % name)
-        tags[name] = value
-    return tags
+    if config.data and 'tags' in config.data:
+        tags = {}
+        for tag in config.data['tags']:
+            name = tag['name']
+            value = text_prompt('Enter value for tag "%s":' % name)
+            tags[name] = value
+        instance.tags = tags
+    else:
+        print Fore.YELLOW + "Warning: no tags defined in config"
+
+    return instance

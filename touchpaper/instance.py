@@ -1,5 +1,7 @@
 import boto.ec2
 
+from colorama import Fore
+
 from .config import get_config
 
 
@@ -18,9 +20,12 @@ class Instance:
     security_group = None
     tags = {}
 
+    key = None
+    secret = None
+    conn = None
+
     _dry_run = False
     _instance = None
-    _conn = None
     _bdm = None
 
     def __init__(self, dry_run):
@@ -48,8 +53,8 @@ class Instance:
 
     def run(self):
         ''' Initiate the instance with boto's run_instances() '''
-        if self._conn:
-            res = self._conn.run_instances(image_id=self.ami,
+        if self.conn:
+            res = self.conn.run_instances(image_id=self.ami,
                                            key_name=self.keypair.name if self.keypair else None,
                                            security_groups=[self.security_group.name,],
                                            instance_type=self.instance_type,
@@ -76,15 +81,10 @@ class Instance:
                 self.set_storage_tag()
         return self
 
-    def set_conn(self, conn):
-        ''' Update the internal boto connection property '''
-        self._conn = conn
-        return self
-
     def set_storage_tag(self):
         ''' Tag the instance's storage with a name '''
         if self._instance and self.storage_name:
-            volumes = self._conn.get_all_volumes(filters={ 'attachment.instance-id': self._instance.id })
+            volumes = self.conn.get_all_volumes(filters={ 'attachment.instance-id': self._instance.id })
             if volumes:
                 volumes[0].add_tag('Name', self.storage_name)
                 print "EBS volume tags added"
@@ -97,3 +97,20 @@ class Instance:
                 self._instance.add_tag(tag, value)
             print "Instance tags added"
         return self
+
+    def show_properties(self):
+        ''' Print instance properties for user confirmation '''
+        print Fore.GREEN + "\nReady to launch instance. You selected the following:"
+        print "Region: %s" % self.region.name
+        print "Availability zone: %s" % self.availability_zone.name
+        print "AMI: %s" % self.ami
+        print "Instance type: %s" % self.instance_type
+        print "Accidental termination protection: %s" % ("Yes" if self.atp else "No")
+        print "Storage: %s" % (('%dGB EBS' % self.storage_size) if self.storage_size else "None")
+        print "Keypair: %s" % (self.keypair.name if self.keypair else "None")
+        print "Security group: %s" % self.security_group.name
+
+        if self.tags:
+            print "Tags:"
+            for tag, value in self.tags.iteritems():
+                print '- "%s": "%s"' % (tag, value)
