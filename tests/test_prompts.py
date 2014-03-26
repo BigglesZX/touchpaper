@@ -1,6 +1,7 @@
 import mock
 
 from touchpaper.config import get_config
+from touchpaper.instance import Instance
 
 
 config = get_config()
@@ -28,33 +29,38 @@ def test_prompt_for_ami_noconfig():
     '''
     Test when called with no config, should return value from text_prompt
     '''
+    instance = Instance()
     with mock.patch('__builtin__.raw_input', return_value='foo'):
         from touchpaper.prompts import prompt_for_ami
-        assert prompt_for_ami() == 'foo'
+        prompt_for_ami(instance)
+        assert instance.ami == 'foo'
 
 
 def test_prompt_for_ami_config_freetext():
     '''
     Test when called with config and string entered, returns string
     '''
+    instance = Instance()
     with mock.patch('__builtin__.raw_input', return_value='foo'):
         from touchpaper.prompts import prompt_for_ami
         config.data = SAMPLE_AMI_CONFIG
-        assert prompt_for_ami() == 'foo'
+        prompt_for_ami(instance)
+        assert instance.ami == 'foo'
 
 
 def test_prompt_for_ami_config_selection():
     '''
     Test when called with config and int entered, returns matching ami entry
     '''
+    instance = Instance()
     with mock.patch('__builtin__.raw_input', return_value=0):
         from touchpaper.prompts import prompt_for_ami
         config.data = SAMPLE_AMI_CONFIG
-        selection = prompt_for_ami()
+        prompt_for_ami(instance)
         for k, v in config.data['favourite_amis'].iteritems():
             first = k
             break
-        assert selection == k
+        assert instance.ami == k
 
 
 def test_prompt_for_atp():
@@ -62,12 +68,16 @@ def test_prompt_for_atp():
     Test proper conversion of 0/1 prompt into bool
     '''
     with mock.patch('__builtin__.raw_input', return_value=0):
+        instance = Instance()
         from touchpaper.prompts import prompt_for_atp
-        assert prompt_for_atp() == False
+        prompt_for_atp(instance)
+        assert instance.atp == False
 
     with mock.patch('__builtin__.raw_input', return_value=1):
+        instance = Instance()
         from touchpaper.prompts import prompt_for_atp
-        assert prompt_for_atp() == True
+        prompt_for_atp(instance)
+        assert instance.atp == True
 
 
 def test_prompt_for_availability_zone():
@@ -87,11 +97,17 @@ def test_prompt_for_availability_zone():
 
     with mock.patch('__builtin__.raw_input', return_value=0):
         from touchpaper.prompts import prompt_for_availability_zone
-        assert prompt_for_availability_zone(Connection()).name == 'FooZone'
+        instance = Instance()
+        instance.conn = Connection()
+        prompt_for_availability_zone(instance)
+        assert instance.availability_zone.name == 'FooZone'
 
     with mock.patch('__builtin__.raw_input', return_value=1):
         from touchpaper.prompts import prompt_for_availability_zone
-        assert prompt_for_availability_zone(Connection()).name == 'BarZone'
+        instance = Instance()
+        instance.conn = Connection()
+        prompt_for_availability_zone(instance)
+        assert instance.availability_zone.name == 'BarZone'
 
 
 def test_prompt_for_keypair():
@@ -105,9 +121,13 @@ def test_prompt_for_keypair():
         def get_all_key_pairs(self):
             return []
 
+    instance = Instance()
+
     # test behaviour of empty keypair list
     from touchpaper.prompts import prompt_for_keypair
-    assert prompt_for_keypair(Connection()) == False
+    instance.conn = Connection()
+    prompt_for_keypair(instance)
+    assert instance.keypair == None
 
     # test behaviour with non-empty list
     class Connection:
@@ -120,11 +140,15 @@ def test_prompt_for_keypair():
 
     with mock.patch('__builtin__.raw_input', return_value=0):
         from touchpaper.prompts import prompt_for_keypair
-        assert prompt_for_keypair(Connection()).name == 'FooPair'
+        instance.conn = Connection()
+        prompt_for_keypair(instance)
+        assert instance.keypair.name == 'FooPair'
 
     with mock.patch('__builtin__.raw_input', return_value=1):
         from touchpaper.prompts import prompt_for_keypair
-        assert prompt_for_keypair(Connection()).name == 'BarPair'
+        instance.conn = Connection()
+        prompt_for_keypair(instance)
+        assert instance.keypair.name == 'BarPair'
 
 
 def test_prompt_for_region():
@@ -144,11 +168,17 @@ def test_prompt_for_region():
 
     with mock.patch('__builtin__.raw_input', return_value=0):
         from touchpaper.prompts import prompt_for_region
-        assert prompt_for_region(Connection()).name == 'FooRegion'
+        instance = Instance()
+        instance.conn = Connection()
+        prompt_for_region(instance)
+        assert instance.region.name == 'FooRegion'
 
     with mock.patch('__builtin__.raw_input', return_value=1):
         from touchpaper.prompts import prompt_for_region
-        assert prompt_for_region(Connection()).name == 'BarRegion'
+        instance = Instance()
+        instance.conn = Connection()
+        prompt_for_region(instance)
+        assert instance.region.name == 'BarRegion'
 
 
 def test_prompt_for_security_group():
@@ -162,9 +192,13 @@ def test_prompt_for_security_group():
         def get_all_security_groups(self):
             return []
 
+    instance = Instance()
+
     # test behaviour of empty security group list
     from touchpaper.prompts import prompt_for_security_group
-    assert prompt_for_security_group(Connection()) == False
+    instance.conn = Connection()
+    prompt_for_security_group(instance)
+    assert instance.security_group == None
 
     # test behaviour with non-empty list
     class Connection:
@@ -177,11 +211,15 @@ def test_prompt_for_security_group():
 
     with mock.patch('__builtin__.raw_input', return_value=0):
         from touchpaper.prompts import prompt_for_security_group
-        assert prompt_for_security_group(Connection()).name == 'FooSecGroup'
+        instance.conn = Connection()
+        prompt_for_security_group(instance)
+        assert instance.security_group.name == 'FooSecGroup'
 
     with mock.patch('__builtin__.raw_input', return_value=1):
         from touchpaper.prompts import prompt_for_security_group
-        assert prompt_for_security_group(Connection()).name == 'BarSecGroup'
+        instance.conn = Connection()
+        prompt_for_security_group(instance)
+        assert instance.security_group.name == 'BarSecGroup'
 
 
 def test_prompt_for_storage():
@@ -190,15 +228,21 @@ def test_prompt_for_storage():
     '''
     with mock.patch('__builtin__.raw_input', return_value=''):
         from touchpaper.prompts import prompt_for_storage
-        assert prompt_for_storage() == False
+        instance = Instance()
+        prompt_for_storage(instance)
+        assert instance.storage_size == 0
 
     with mock.patch('__builtin__.raw_input', return_value='0'):
         from touchpaper.prompts import prompt_for_storage
-        assert prompt_for_storage() == False
+        instance = Instance()
+        prompt_for_storage(instance)
+        assert instance.storage_size == 0
 
     with mock.patch('__builtin__.raw_input', return_value='8'):
         from touchpaper.prompts import prompt_for_storage
-        assert prompt_for_storage() == 8
+        instance = Instance()
+        prompt_for_storage(instance)
+        assert instance.storage_size == 8
 
 
 def test_prompt_for_tags():
@@ -208,6 +252,7 @@ def test_prompt_for_tags():
     with mock.patch('__builtin__.raw_input', return_value='foo'):
         from touchpaper.prompts import prompt_for_tags
         config.data = SAMPLE_TAG_CONFIG
-        tags = prompt_for_tags()
-        assert 'Name' in tags
-        assert 'OS' in tags
+        instance = Instance()
+        prompt_for_tags(instance)
+        assert 'Name' in instance.tags
+        assert 'OS' in instance.tags

@@ -50,7 +50,7 @@ def main():
         sys.exit(1)
 
     ''' Instantiate instance '''
-    instance = Instance(args.dry_run)
+    instance = Instance(dry_run=args.dry_run)
 
     pipeline = [
         prompt_for_credentials,

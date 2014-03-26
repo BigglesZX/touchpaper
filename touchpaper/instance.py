@@ -28,16 +28,16 @@ class Instance:
     _instance = None
     _bdm = None
 
-    def __init__(self, dry_run):
+    def __init__(self, **kwargs):
         ''' Pick up dry-run arg if set '''
-        if dry_run:
+        if kwargs.get('dry_run', False):
             self._dry_run = True
 
     def get(self):
         ''' Return the actual boto instance representation '''
         return self._instance
 
-    def prep_storage(self, size):
+    def prep_storage(self):
         '''
         If a storage size is specified, set up the EC2 BlockDeviceMapping ready
         to attach it to the instance at launch
