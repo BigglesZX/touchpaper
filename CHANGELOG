@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2.8 (March 26th, 2014)
+--------------------------
+
+* Improved: Refactored internal instance representation to vastly simplify code
+
 0.2.7 (March 24th, 2014)
 --------------------------
 
