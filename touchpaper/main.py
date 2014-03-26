@@ -7,7 +7,6 @@ import sys
 
 from colorama import init, Fore
 from os import environ
-from time import sleep
 
 from ._version import get_version
 from .config import get_config
@@ -36,9 +35,6 @@ def main():
     if args.version:
         print "touchpaper v%s" % get_version()
         sys.exit(0)
-
-    if args.dry_run:
-        print Fore.YELLOW + "Warning: dry-run mode is active"
 
     ''' Retrieve and check config object and warn if env vars aren't set '''
     global config
@@ -78,7 +74,6 @@ def main():
         sys.exit(0)
 
     print Fore.CYAN + "Launching instance..."
-
     instance.run()
 
     ''' That's it! '''

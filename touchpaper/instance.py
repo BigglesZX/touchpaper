@@ -1,6 +1,7 @@
 import boto.ec2
 
 from colorama import Fore
+from time import sleep
 
 from .config import get_config
 
@@ -30,12 +31,10 @@ class Instance:
 
     def __init__(self, **kwargs):
         ''' Pick up dry-run arg if set '''
-        if kwargs.get('dry_run', False):
-            self._dry_run = True
+        self._dry_run = kwargs.get('dry_run', False)
 
-    def get(self):
-        ''' Return the actual boto instance representation '''
-        return self._instance
+        if self._dry_run:
+            print Fore.YELLOW + "Warning: dry-run mode is active"
 
     def prep_storage(self):
         '''
@@ -55,13 +54,13 @@ class Instance:
         ''' Initiate the instance with boto's run_instances() '''
         if self.conn:
             res = self.conn.run_instances(image_id=self.ami,
-                                           key_name=self.keypair.name if self.keypair else None,
-                                           security_groups=[self.security_group.name,],
-                                           instance_type=self.instance_type,
-                                           placement=self.availability_zone.name,
-                                           block_device_map=self._bdm if self._bdm else None,
-                                           disable_api_termination=self.atp,
-                                           dry_run=self._dry_run)
+                                          key_name=self.keypair.name if self.keypair else None,
+                                          security_groups=[self.security_group.name,],
+                                          instance_type=self.instance_type,
+                                          placement=self.availability_zone.name,
+                                          block_device_map=self._bdm if self._bdm else None,
+                                          disable_api_termination=self.atp,
+                                          dry_run=self._dry_run)
             self._instance = res.instances[0]
 
             ''' Wait until the instance reports a running state '''
@@ -95,7 +94,7 @@ class Instance:
         if self.tags:
             for tag, value in self.tags.iteritems():
                 self._instance.add_tag(tag, value)
-            print "Instance tags added"
+        print "Instance tags added"
         return self
 
     def show_properties(self):

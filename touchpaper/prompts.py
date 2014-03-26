@@ -64,6 +64,7 @@ def prompt_for_availability_zone(instance):
                               default=config.get_default('availability_zone'))
     config.set_default('availability_zone', selection)
     instance.availability_zone = available_zones[selection]
+
     return instance
 
 
@@ -126,7 +127,7 @@ def prompt_for_keypair(instance):
 def prompt_for_region(instance):
     '''
     Get a list of available regions from the current connection and prompt
-    the user for a choice
+    the user for a choice, then connect to the region
     '''
     available_regions = instance.conn.get_all_regions()
     selection = choice_prompt([x.name for x in available_regions],
@@ -151,8 +152,6 @@ def prompt_for_security_group(instance):
     '''
     Get a list of available security groups from the current connection and
     prompt the user to choose one
-
-    TODO: option to create new security group with sensible defaults
     '''
     available_security_groups = instance.conn.get_all_security_groups()
     if available_security_groups:
