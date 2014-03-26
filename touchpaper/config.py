@@ -7,7 +7,7 @@ from os.path import exists, expanduser, join
 '''
 The global config object
 '''
-class Config():
+class Config:
     RC_FILE_NAME = '.touchpaperrc'
 
     AWS_KEY_ENV_VAR = 'AWS_ACCESS_KEY_ID'
