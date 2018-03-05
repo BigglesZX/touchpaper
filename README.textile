@@ -2,7 +2,7 @@ h1. touchpaper
 
 A command-line utility to quickly launch EC2 instances. A tasty accompaniment to Fabric.
 
-!https://pypip.in/download/touchpaper/badge.svg?period=month! !https://pypip.in/version/touchpaper/badge.svg! !https://pypip.in/py_versions/touchpaper/badge.svg! !https://pypip.in/status/touchpaper/badge.svg!
+!https://img.shields.io/pypi/dm/touchpaper.svg! !https://img.shields.io/pypi/v/touchpaper.svg! !https://img.shields.io/pypi/pyversions/touchpaper.svg! !https://img.shields.io/pypi/status/touchpaper.svg!
 
 h2. Installation
 
